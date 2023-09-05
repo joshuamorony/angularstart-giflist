@@ -1,13 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import HomeComponent from './home.component';
+import { RedditService } from '../shared/data-access/reddit.service';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
 
+  const testGifs = [{}, {}, {}];
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HomeComponent],
+      providers: [
+        {
+          provide: RedditService,
+          useValue: {
+            gifs: jest.fn().mockReturnValue(testGifs),
+          },
+        },
+      ],
     })
       .overrideComponent(HomeComponent, {
         remove: { imports: [] },
@@ -22,5 +35,19 @@ describe('HomeComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('app-gif-list', () => {
+    let gifList: DebugElement;
+
+    beforeEach(() => {
+      gifList = fixture.debugElement.query(By.css('app-gif-list'));
+    });
+
+    describe('input: gifs', () => {
+      it('should supply the gifs selector from the reddit service', () => {
+        expect(gifList.componentInstance.gifs).toEqual(testGifs);
+      });
+    });
   });
 });
