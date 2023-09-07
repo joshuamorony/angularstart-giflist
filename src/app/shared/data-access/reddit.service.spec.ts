@@ -57,7 +57,9 @@ describe('RedditService', () => {
     const expectedResults = [parsedPost, parsedPost, parsedPost] as any;
 
     it('should set gifs on initial load from gifs subreddit', () => {
-      const request = httpMock.expectOne('/r/gifs/hot/.json');
+      const request = httpMock.expectOne(
+        'https://www.reddit.com/r/gifs/hot/.json?limit=100'
+      );
       request.flush(mockData);
 
       expect(service.gifs()).toEqual(expectedResults);
