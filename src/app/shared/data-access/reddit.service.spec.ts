@@ -37,10 +37,8 @@ describe('RedditService', () => {
     };
 
     const mockData = {
-      response: {
-        data: {
-          children: [mockPost, mockPost, mockPost],
-        },
+      data: {
+        children: [mockPost, mockPost, mockPost],
       },
     };
 
