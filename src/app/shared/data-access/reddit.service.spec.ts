@@ -62,8 +62,5 @@ describe('RedditService', () => {
 
       expect(service.gifs()).toEqual(expectedResults);
     });
-
-    // it('should set gifs from subreddit when control value changes', () => {});
-    // it('should set error if request fails', () => {});
   });
 });
