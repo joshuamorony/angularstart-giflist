@@ -24,13 +24,43 @@ describe('RedditService', () => {
   });
 
   describe('source: gifsLoaded$', () => {
-    const mockData = [{}, {}, {}] as any;
+    const mockPost = {
+      data: {
+        url: 'test.mp4',
+        author: 'josh',
+        name: 'whatever',
+        permalink: 'link',
+        title: 'title',
+        thumbnail: 'thumb',
+        num_comments: 5,
+      },
+    };
+
+    const mockData = {
+      response: {
+        data: {
+          children: [mockPost, mockPost, mockPost],
+        },
+      },
+    };
+
+    const parsedPost = {
+      src: mockPost.data.url,
+      author: mockPost.data.author,
+      name: mockPost.data.name,
+      permalink: mockPost.data.permalink,
+      title: mockPost.data.title,
+      thumbnail: mockPost.data.thumbnail,
+      comments: mockPost.data.num_comments,
+    };
+
+    const expectedResults = [parsedPost, parsedPost, parsedPost] as any;
 
     it('should set gifs on initial load from gifs subreddit', () => {
       const request = httpMock.expectOne('/r/gifs/hot/.json');
       request.flush(mockData);
 
-      expect(service.gifs()).toEqual(mockData);
+      expect(service.gifs()).toEqual(expectedResults);
     });
 
     // it('should set gifs from subreddit when control value changes', () => {});
