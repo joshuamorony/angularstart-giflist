@@ -26,14 +26,14 @@ describe('GifListComponent', () => {
   });
 
   describe('input: gifs', () => {
-    it('should render a list item for each element', () => {
+    it('should render a video for each element', () => {
       const testData = [{}, {}, {}] as any;
       component.gifs = testData;
 
       fixture.detectChanges();
 
       const items = fixture.debugElement.queryAll(
-        By.css('[data-testid="gif-list-item"]')
+        By.css('[data-testid="gif-list-item"] video')
       );
 
       expect(items.length).toEqual(testData.length);
