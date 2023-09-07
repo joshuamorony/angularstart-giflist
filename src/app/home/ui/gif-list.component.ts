@@ -6,12 +6,18 @@ import { Gif } from 'src/app/shared/interfaces';
   standalone: true,
   selector: 'app-gif-list',
   template: `
-    <ul>
-      <li
-        *ngFor="let gif of gifs; trackBy: trackByFn"
-        data-testid="gif-list-item"
-      ></li>
-    </ul>
+    <div
+      *ngFor="let gif of gifs; trackBy: trackByFn"
+      data-testid="gif-list-item"
+    >
+      <video
+        playsinline
+        poster="none"
+        preload="none"
+        [loop]="true"
+        [muted]="true"
+      ></video>
+    </div>
   `,
   imports: [CommonModule],
 })
