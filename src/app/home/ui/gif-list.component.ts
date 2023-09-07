@@ -16,6 +16,7 @@ import { Gif } from 'src/app/shared/interfaces';
         preload="none"
         [loop]="true"
         [muted]="true"
+        [src]="gif.src"
       ></video>
     </div>
   `,

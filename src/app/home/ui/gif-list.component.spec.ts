@@ -40,7 +40,7 @@ describe('GifListComponent', () => {
     });
 
     it('should use the src of the gif as the src for the video', () => {
-      const testSrc = 'test.mp4';
+      const testSrc = 'http://test.com/test.mp4';
       const testData = [{ src: testSrc }] as any;
       component.gifs = testData;
 
