@@ -38,5 +38,17 @@ describe('GifListComponent', () => {
 
       expect(items.length).toEqual(testData.length);
     });
+
+    it('should use the src of the gif as the src for the video', () => {
+      const testSrc = 'test.mp4';
+      const testData = [{ src: testSrc }] as any;
+      component.gifs = testData;
+
+      fixture.detectChanges();
+
+      const video = fixture.debugElement.query(By.css('video'));
+
+      expect(video.nativeElement.src).toEqual(testSrc);
+    });
   });
 });
