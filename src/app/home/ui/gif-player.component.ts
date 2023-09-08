@@ -16,4 +16,11 @@ import { Component, Input } from '@angular/core';
 })
 export class GifPlayerComponent {
   @Input({ required: true }) src!: string;
+
+  // state
+  // loading | loaded | playing
+
+  // sources
+  // play subject
+  // stream from loadeddata event listener
 }
