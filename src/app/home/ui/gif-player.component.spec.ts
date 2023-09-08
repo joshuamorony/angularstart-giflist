@@ -19,6 +19,8 @@ describe('GifPlayerComponent', () => {
 
     fixture = TestBed.createComponent(GifPlayerComponent);
     component = fixture.componentInstance;
+    component.src = 'http://test.com/test.mp4';
+
     fixture.detectChanges();
   });
 
@@ -44,6 +46,8 @@ describe('GifPlayerComponent', () => {
 
     beforeEach(() => {
       video = fixture.debugElement.query(By.css('video'));
+      video.nativeElement.pause = jest.fn();
+      video.nativeElement.play = jest.fn();
     });
 
     it('should play when video finishes loading', () => {
@@ -58,23 +62,20 @@ describe('GifPlayerComponent', () => {
       });
 
       it('should play if paused', () => {
-        Object.defineProperty(video, 'paused', {
-          get: jest.fn(() => true),
-        });
-
-        const playSpy = jest.spyOn(video.nativeElement, 'play');
         video.nativeElement.click();
-        expect(playSpy).toHaveBeenCalled();
+        fixture.detectChanges();
+
+        expect(video.nativeElement.play).toHaveBeenCalled();
       });
 
       it('should pause if playing', () => {
-        Object.defineProperty(video, 'paused', {
-          get: jest.fn(() => false),
-        });
+        component.togglePlay$.next();
+        fixture.detectChanges();
 
-        const pauseSpy = jest.spyOn(video.nativeElement, 'pause');
         video.nativeElement.click();
-        expect(pauseSpy).toHaveBeenCalled();
+        fixture.detectChanges();
+
+        expect(video.nativeElement.pause).toHaveBeenCalled();
       });
     });
 
