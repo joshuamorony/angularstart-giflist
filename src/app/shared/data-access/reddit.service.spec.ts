@@ -65,8 +65,6 @@ describe('RedditService', () => {
       );
       request.flush(mockData);
 
-      console.log(expectedResults);
-
       expect(service.gifs()).toEqual(expectedResults);
     });
   });

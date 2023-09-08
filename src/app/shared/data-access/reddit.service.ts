@@ -35,15 +35,17 @@ export class RedditService {
   }
 
   private convertRedditPostsToGifs(posts: RedditPost[]) {
-    return posts.map((post) => ({
-      src: this.getBestSrcForGif(post),
-      author: post.data.author,
-      name: post.data.name,
-      permalink: post.data.permalink,
-      title: post.data.title,
-      thumbnail: post.data.thumbnail,
-      comments: post.data.num_comments,
-    }));
+    return posts
+      .map((post) => ({
+        src: this.getBestSrcForGif(post),
+        author: post.data.author,
+        name: post.data.name,
+        permalink: post.data.permalink,
+        title: post.data.title,
+        thumbnail: post.data.thumbnail,
+        comments: post.data.num_comments,
+      }))
+      .filter((post): post is Gif => post.src !== null);
   }
 
   private getBestSrcForGif(post: RedditPost) {
