@@ -36,9 +36,11 @@ describe('RedditService', () => {
       },
     };
 
+    const mockPostWithInvalidSrc = { ...mockPost, src: '' };
+
     const mockData = {
       data: {
-        children: [mockPost, mockPost, mockPost],
+        children: [mockPost, mockPost, mockPost, mockPostWithInvalidSrc],
       },
     };
 
