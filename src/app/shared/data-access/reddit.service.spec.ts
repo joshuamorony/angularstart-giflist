@@ -36,7 +36,10 @@ describe('RedditService', () => {
       },
     };
 
-    const mockPostWithInvalidSrc = { ...mockPost, src: '' };
+    const mockPostWithInvalidSrc = {
+      ...mockPost,
+      data: { ...mockPost.data, url: '' },
+    };
 
     const mockData = {
       data: {
@@ -61,6 +64,8 @@ describe('RedditService', () => {
         'https://www.reddit.com/r/gifs/hot/.json?limit=100'
       );
       request.flush(mockData);
+
+      console.log(expectedResults);
 
       expect(service.gifs()).toEqual(expectedResults);
     });
