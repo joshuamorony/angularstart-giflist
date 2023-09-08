@@ -1,4 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import { GifPlayerComponent } from './gif-player.component';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
@@ -48,6 +53,10 @@ describe('GifPlayerComponent', () => {
       video = fixture.debugElement.query(By.css('video'));
       video.nativeElement.pause = jest.fn();
       video.nativeElement.play = jest.fn();
+      video.nativeElement.load = jest.fn().mockImplementation(async () => {
+        await Promise.resolve();
+        video.triggerEventHandler('loadeddata', null);
+      });
     });
 
     it('should play when video finishes loading', () => {
@@ -56,9 +65,7 @@ describe('GifPlayerComponent', () => {
 
     describe('ready when clicked', () => {
       beforeEach(() => {
-        Object.defineProperty(video, 'readyState', {
-          get: jest.fn(() => 4),
-        });
+        video.triggerEventHandler('loadeddata', null);
       });
 
       it('should play if paused', () => {
@@ -80,7 +87,19 @@ describe('GifPlayerComponent', () => {
     });
 
     describe('not ready when clicked', () => {
-      it('should trigger loading of video', () => {
+      it('should trigger loading of video', fakeAsync(() => {
+        video.nativeElement.click();
+        fixture.detectChanges();
+
+        expect(component.status()).toEqual('loading');
+        tick();
+        expect(component.status()).toEqual('loaded');
+      }));
+
+      it('should play video after loaded if playing is true', () => {
+        expect(false).toBeTruthy();
+      });
+      it('should NOT play video after loaded if playing is false', () => {
         expect(false).toBeTruthy();
       });
     });

@@ -12,7 +12,7 @@ import { Subject, tap } from 'rxjs';
 
 interface GifPlayerState {
   playing: boolean;
-  loaded: boolean;
+  status: 'initial' | 'loading' | 'loaded';
 }
 
 @Component({
@@ -37,12 +37,12 @@ export class GifPlayerComponent {
 
   state = signal<GifPlayerState>({
     playing: false,
-    loaded: false,
+    status: 'initial',
   });
 
   //selectors
   playing = computed(() => this.state().playing);
-  loaded = computed(() => this.state().loaded);
+  status = computed(() => this.state().status);
 
   // sources
   togglePlay$ = new Subject<void>();
