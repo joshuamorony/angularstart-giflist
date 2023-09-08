@@ -9,8 +9,8 @@ import { Gif } from 'src/app/shared/interfaces';
   template: `
     <app-gif-player
       *ngFor="let gif of gifs; trackBy: trackByFn"
+      [src]="gif.src"
       data-testid="gif-list-item"
-      src=""
     ></app-gif-player>
   `,
   imports: [CommonModule, GifPlayerComponent],

@@ -10,6 +10,7 @@ import { Component, Input } from '@angular/core';
       preload="none"
       [loop]="true"
       [muted]="true"
+      [src]="src"
     ></video>
   `,
 })
