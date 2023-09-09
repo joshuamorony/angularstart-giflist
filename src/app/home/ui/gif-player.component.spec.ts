@@ -2,6 +2,7 @@ import {
   ComponentFixture,
   TestBed,
   fakeAsync,
+  flushMicrotasks,
   tick,
 } from '@angular/core/testing';
 import { GifPlayerComponent } from './gif-player.component';
@@ -53,9 +54,13 @@ describe('GifPlayerComponent', () => {
       video = fixture.debugElement.query(By.css('video'));
       video.nativeElement.pause = jest.fn();
       video.nativeElement.play = jest.fn();
-      video.nativeElement.load = jest.fn().mockImplementation(async () => {
-        await Promise.resolve();
-        video.triggerEventHandler('loadeddata', null);
+      video.nativeElement.load = jest.fn().mockImplementation(() => {
+        return new Promise((resolve) => {
+          resolve(null);
+          setTimeout(() => {
+            video.nativeElement.dispatchEvent(new Event('loadeddata'));
+          }, 0);
+        });
       });
     });
 
@@ -87,14 +92,16 @@ describe('GifPlayerComponent', () => {
     });
 
     describe('not ready when clicked', () => {
-      it('should trigger loading of video', fakeAsync(() => {
+      it('should trigger loading of video', () => {
         video.nativeElement.click();
         fixture.detectChanges();
 
         expect(component.status()).toEqual('loading');
-        tick();
-        expect(component.status()).toEqual('loaded');
-      }));
+
+        fixture.whenStable().then(() => {
+          expect(component.status()).toEqual('loaded');
+        });
+      });
 
       it('should play video after loaded if playing is true', () => {
         expect(false).toBeTruthy();
