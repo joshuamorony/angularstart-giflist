@@ -70,26 +70,29 @@ export class GifPlayerComponent {
       );
 
     // effects
-    effect(() => {
-      const video = this.video?.nativeElement;
-      const playing = this.playing();
-      const status = this.status();
+    effect(
+      () => {
+        const video = this.video?.nativeElement;
+        const playing = this.playing();
+        const status = this.status();
 
-      if (!video) return;
+        if (!video) return;
 
-      if (status === 'initial') {
-        this.videoLoadStart$.next();
+        if (status === 'initial') {
+          video.addEventListener('loadeddata', () => {
+            this.videoLoadComplete$.next();
+          });
 
-        video.addEventListener('loadeddata', () => {
-          this.videoLoadComplete$.next();
-        });
+          this.videoLoadStart$.next();
 
-        video.load();
-      }
+          video.load();
+        }
 
-      if (status === 'loaded') {
-        playing ? video.play() : video.pause();
-      }
-    });
+        if (status === 'loaded') {
+          playing ? video.play() : video.pause();
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 }
