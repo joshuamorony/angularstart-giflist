@@ -64,10 +64,6 @@ describe('GifPlayerComponent', () => {
       });
     });
 
-    it('should play when video finishes loading', () => {
-      expect(false).toBeTruthy();
-    });
-
     describe('ready when clicked', () => {
       beforeEach(async () => {
         component.videoLoadComplete$.next();
@@ -104,10 +100,22 @@ describe('GifPlayerComponent', () => {
       });
 
       it('should play video after loaded if playing is true', () => {
-        expect(false).toBeTruthy();
+        video.nativeElement.click();
+        fixture.detectChanges();
+
+        fixture.whenStable().then(() => {
+          expect(video.nativeElement.play).toHaveBeenCalled();
+        });
       });
+
       it('should NOT play video after loaded if playing is false', () => {
-        expect(false).toBeTruthy();
+        video.nativeElement.click();
+        video.nativeElement.click();
+        fixture.detectChanges();
+
+        fixture.whenStable().then(() => {
+          expect(video.nativeElement.play).toHaveBeenCalled();
+        });
       });
     });
   });
