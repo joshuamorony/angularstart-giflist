@@ -1,10 +1,4 @@
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  flushMicrotasks,
-  tick,
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GifPlayerComponent } from './gif-player.component';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
@@ -65,7 +59,7 @@ describe('GifPlayerComponent', () => {
     });
 
     describe('ready when clicked', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         component.videoLoadComplete$.next();
       });
 
