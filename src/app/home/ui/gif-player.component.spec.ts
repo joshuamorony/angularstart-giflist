@@ -64,8 +64,8 @@ describe('GifPlayerComponent', () => {
     });
 
     describe('ready when clicked', () => {
-      beforeEach(() => {
-        video.triggerEventHandler('loadeddata', null);
+      beforeEach(async () => {
+        component.videoLoadComplete$.next();
       });
 
       it('should play if paused', () => {

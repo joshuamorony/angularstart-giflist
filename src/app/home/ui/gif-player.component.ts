@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, tap } from 'rxjs';
+import { Subject } from 'rxjs';
 
 interface GifPlayerState {
   playing: boolean;
@@ -46,23 +46,50 @@ export class GifPlayerComponent {
 
   // sources
   togglePlay$ = new Subject<void>();
-  // stream from loadeddata event listener
+  videoLoadStart$ = new Subject<void>();
+  videoLoadComplete$ = new Subject<void>();
 
   constructor() {
     //reducers
+    this.videoLoadStart$
+      .pipe(takeUntilDestroyed())
+      .subscribe(() =>
+        this.state.update((state) => ({ ...state, status: 'loading' }))
+      );
+
+    this.videoLoadComplete$
+      .pipe(takeUntilDestroyed())
+      .subscribe(() =>
+        this.state.update((state) => ({ ...state, status: 'loaded' }))
+      );
+
     this.togglePlay$
       .pipe(takeUntilDestroyed())
       .subscribe(() =>
         this.state.update((state) => ({ ...state, playing: !state.playing }))
       );
 
+    // effects
     effect(() => {
       const video = this.video?.nativeElement;
       const playing = this.playing();
+      const status = this.status();
 
       if (!video) return;
 
-      playing ? video.play() : video.pause();
+      if (status === 'initial') {
+        this.videoLoadStart$.next();
+
+        video.addEventListener('loadeddata', () => {
+          this.videoLoadComplete$.next();
+        });
+
+        video.load();
+      }
+
+      if (status === 'loaded') {
+        playing ? video.play() : video.pause();
+      }
     });
   }
 }
