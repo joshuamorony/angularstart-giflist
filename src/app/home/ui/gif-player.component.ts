@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   ElementRef,
@@ -21,6 +22,14 @@ interface GifPlayerState {
   template: `
     <div
       [style.background]="'url(' + thumbnail + ') 50% 50% / cover no-repeat'"
+      [ngStyle]="
+        !(status() === 'loaded')
+          ? {
+              filter: 'blur(3px) brightness(0.6)',
+              transform: 'scale(1.1)'
+            }
+          : {}
+      "
       class="preload-background"
     >
       <video
@@ -50,6 +59,7 @@ interface GifPlayerState {
       }
     `,
   ],
+  imports: [CommonModule],
 })
 export class GifPlayerComponent {
   @Input({ required: true }) src!: string;
