@@ -50,5 +50,17 @@ describe('GifListComponent', () => {
 
       expect(player.componentInstance.src).toEqual(testSrc);
     });
+
+    it('should use the thumbnail of the gif as the thumbnail input', () => {
+      const testThumb = 'test.png';
+      const testData = [{ thumbnail: testThumb }] as any;
+      component.gifs = testData;
+
+      fixture.detectChanges();
+
+      const player = fixture.debugElement.query(By.css('app-gif-player'));
+
+      expect(player.componentInstance.thumbnail).toEqual(testThumb);
+    });
   });
 });
