@@ -19,17 +19,37 @@ interface GifPlayerState {
   standalone: true,
   selector: 'app-gif-player',
   template: `
-    <video
-      (click)="togglePlay$.next()"
-      #gifPlayer
-      playsinline
-      poster="none"
-      preload="none"
-      [loop]="true"
-      [muted]="true"
-      [src]="src"
-    ></video>
+    <div
+      [style.background]="'url(' + thumbnail + ') 50% 50% / cover no-repeat'"
+      class="preload-background"
+    >
+      <video
+        (click)="togglePlay$.next()"
+        #gifPlayer
+        playsinline
+        poster="none"
+        preload="none"
+        [loop]="true"
+        [muted]="true"
+        [src]="src"
+      ></video>
+    </div>
   `,
+  styles: [
+    `
+      .preload-background {
+        width: 100%;
+        height: auto;
+      }
+
+      video {
+        width: 100%;
+        height: auto;
+        margin: auto;
+        background: transparent;
+      }
+    `,
+  ],
 })
 export class GifPlayerComponent {
   @Input({ required: true }) src!: string;

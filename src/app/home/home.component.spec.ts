@@ -3,6 +3,8 @@ import HomeComponent from './home.component';
 import { RedditService } from '../shared/data-access/reddit.service';
 import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
+import { GifListComponent } from './ui/gif-list.component';
+import { MockGifListComponent } from './ui/gif-list.component.spec';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -23,8 +25,8 @@ describe('HomeComponent', () => {
       ],
     })
       .overrideComponent(HomeComponent, {
-        remove: { imports: [] },
-        add: { imports: [] },
+        remove: { imports: [GifListComponent] },
+        add: { imports: [MockGifListComponent] },
       })
       .compileComponents();
 

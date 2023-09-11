@@ -1,6 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GifListComponent } from './gif-list.component';
 import { By } from '@angular/platform-browser';
+import { GifPlayerComponent } from './gif-player.component';
+import { MockGifPlayerComponent } from './gif-player.component.spec';
+
+import { Component, Input } from '@angular/core';
+import { Gif } from 'src/app/shared/interfaces';
+
+@Component({
+  standalone: true,
+  selector: 'app-gif-list',
+  template: ` <p>Hello world</p> `,
+})
+export class MockGifListComponent {
+  @Input({ required: true }) gifs!: Gif[];
+}
 
 describe('GifListComponent', () => {
   let component: GifListComponent;
@@ -11,8 +25,8 @@ describe('GifListComponent', () => {
       imports: [GifListComponent],
     })
       .overrideComponent(GifListComponent, {
-        remove: { imports: [] },
-        add: { imports: [] },
+        remove: { imports: [GifPlayerComponent] },
+        add: { imports: [MockGifPlayerComponent] },
       })
       .compileComponents();
 

@@ -1,7 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GifPlayerComponent } from './gif-player.component';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import { DebugElement, Input } from '@angular/core';
+
+import { Component } from '@angular/core';
+
+@Component({
+  standalone: true,
+  selector: 'app-gif-player',
+  template: ` <p>Hello world</p> `,
+})
+export class MockGifPlayerComponent {
+  @Input({ required: true }) src!: string;
+  @Input({ required: true }) thumbnail!: string;
+}
 
 describe('GifPlayerComponent', () => {
   let component: GifPlayerComponent;
@@ -20,6 +32,7 @@ describe('GifPlayerComponent', () => {
     fixture = TestBed.createComponent(GifPlayerComponent);
     component = fixture.componentInstance;
     component.src = 'http://test.com/test.mp4';
+    component.thumbnail = 'test.png';
 
     fixture.detectChanges();
   });
