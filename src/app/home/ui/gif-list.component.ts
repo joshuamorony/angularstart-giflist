@@ -10,6 +10,7 @@ import { Gif } from 'src/app/shared/interfaces';
     <app-gif-player
       *ngFor="let gif of gifs; trackBy: trackByFn"
       [src]="gif.src"
+      [thumbnail]="gif.thumbnail"
       data-testid="gif-list-item"
     ></app-gif-player>
   `,

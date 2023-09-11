@@ -33,6 +33,7 @@ interface GifPlayerState {
 })
 export class GifPlayerComponent {
   @Input({ required: true }) src!: string;
+  @Input({ required: true }) thumbnail!: string;
   @ViewChild('gifPlayer') video!: ElementRef<HTMLVideoElement>;
 
   state = signal<GifPlayerState>({
