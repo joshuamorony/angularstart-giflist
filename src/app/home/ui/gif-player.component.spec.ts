@@ -41,6 +41,19 @@ describe('GifPlayerComponent', () => {
     });
   });
 
+  describe('input: thumbnail', () => {
+    it('should use the supplied thumbnail for the preload background element', () => {
+      const testThumb = 'test.png';
+      component.thumbnail = testThumb;
+
+      fixture.detectChanges();
+
+      const result = fixture.debugElement.query(By.css('.preload-background'));
+
+      expect(result.nativeElement.style.background).toContain(testThumb);
+    });
+  });
+
   describe('video', () => {
     let video: DebugElement;
 
