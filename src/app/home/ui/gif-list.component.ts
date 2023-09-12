@@ -11,7 +11,7 @@ import { WINDOW } from 'src/app/shared/utils/injection-tokens';
   standalone: true,
   selector: 'app-gif-list',
   template: `
-    <ng-container *ngFor="let gif of gifs; trackBy: trackByFn">
+    <div *ngFor="let gif of gifs; trackBy: trackByFn">
       <app-gif-player
         [src]="gif.src"
         [thumbnail]="gif.thumbnail"
@@ -27,7 +27,7 @@ import { WINDOW } from 'src/app/shared/utils/injection-tokens';
           <mat-icon>comment</mat-icon>
         </button>
       </mat-toolbar>
-    </ng-container>
+    </div>
   `,
   imports: [
     CommonModule,
@@ -35,6 +35,14 @@ import { WINDOW } from 'src/app/shared/utils/injection-tokens';
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
+  ],
+  styles: [
+    `
+      div {
+        margin: 1rem;
+        filter: drop-shadow(0px 0px 6px #0e0c1ba8);
+      }
+    `,
   ],
 })
 export class GifListComponent {

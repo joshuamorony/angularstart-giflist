@@ -10,7 +10,7 @@ import { SearchBarComponent } from './ui/search-bar.component';
     <app-search-bar
       [subredditFormControl]="redditService.subredditFormControl"
     ></app-search-bar>
-    <app-gif-list [gifs]="redditService.gifs()" />
+    <app-gif-list [gifs]="redditService.gifs()" class="grid-container" />
   `,
   imports: [GifListComponent, SearchBarComponent],
 })
