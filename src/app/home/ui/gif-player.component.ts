@@ -53,7 +53,9 @@ interface GifPlayerState {
   styles: [
     `
       :host {
+        display: block;
         position: relative;
+        overflow: hidden;
       }
 
       .preload-background {
