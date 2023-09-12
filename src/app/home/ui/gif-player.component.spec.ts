@@ -89,6 +89,28 @@ describe('GifPlayerComponent', () => {
       });
     });
 
+    it('should display spinner when loading', () => {
+      const spinnerBeforeLoading = fixture.debugElement.query(
+        By.css('mat-progress-spinner')
+      );
+      expect(spinnerBeforeLoading).toBeFalsy();
+
+      video.nativeElement.click();
+      fixture.detectChanges();
+
+      const spinnerWhileLoading = fixture.debugElement.query(
+        By.css('mat-progress-spinner')
+      );
+      expect(spinnerWhileLoading).toBeTruthy();
+
+      fixture.whenStable().then(() => {
+        const spinnerAfterLoading = fixture.debugElement.query(
+          By.css('mat-progress-spinner')
+        );
+        expect(spinnerAfterLoading).toBeFalsy();
+      });
+    });
+
     describe('ready when clicked', () => {
       beforeEach(() => {
         component.videoLoadComplete$.next();
