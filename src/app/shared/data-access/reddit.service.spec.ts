@@ -9,6 +9,41 @@ describe('RedditService', () => {
   let service: RedditService;
   let httpMock: HttpTestingController;
 
+  const mockPost = {
+    data: {
+      url: 'test.mp4',
+      author: 'josh',
+      name: 'whatever',
+      permalink: 'link',
+      title: 'title',
+      thumbnail: 'thumb',
+      num_comments: 5,
+    },
+  };
+
+  const mockPostWithInvalidSrc = {
+    ...mockPost,
+    data: { ...mockPost.data, url: '' },
+  };
+
+  const mockData = {
+    data: {
+      children: [mockPost, mockPost, mockPost, mockPostWithInvalidSrc],
+    },
+  };
+
+  const parsedPost = {
+    src: mockPost.data.url,
+    author: mockPost.data.author,
+    name: mockPost.data.name,
+    permalink: mockPost.data.permalink,
+    title: mockPost.data.title,
+    thumbnail: mockPost.data.thumbnail,
+    comments: mockPost.data.num_comments,
+  };
+
+  const expectedResults = [parsedPost, parsedPost, parsedPost] as any;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -23,42 +58,24 @@ describe('RedditService', () => {
     expect(service).toBeTruthy();
   });
 
+  describe('source: subredditChanged$', () => {
+    it('should load data from specified subreddit when form control changes', () => {
+      const altMockData = [mockPost, mockPost];
+      const expectedResults = [parsedPost, parsedPost] as any;
+
+      const testValue = 'funny';
+      service.subredditFormControl.setValue(testValue);
+
+      const request = httpMock.expectOne(
+        `https://www.reddit.com/r/${testValue}/hot/.json?limit=100`
+      );
+      request.flush(altMockData);
+
+      expect(service.gifs()).toEqual(expectedResults);
+    });
+  });
+
   describe('source: gifsLoaded$', () => {
-    const mockPost = {
-      data: {
-        url: 'test.mp4',
-        author: 'josh',
-        name: 'whatever',
-        permalink: 'link',
-        title: 'title',
-        thumbnail: 'thumb',
-        num_comments: 5,
-      },
-    };
-
-    const mockPostWithInvalidSrc = {
-      ...mockPost,
-      data: { ...mockPost.data, url: '' },
-    };
-
-    const mockData = {
-      data: {
-        children: [mockPost, mockPost, mockPost, mockPostWithInvalidSrc],
-      },
-    };
-
-    const parsedPost = {
-      src: mockPost.data.url,
-      author: mockPost.data.author,
-      name: mockPost.data.name,
-      permalink: mockPost.data.permalink,
-      title: mockPost.data.title,
-      thumbnail: mockPost.data.thumbnail,
-      comments: mockPost.data.num_comments,
-    };
-
-    const expectedResults = [parsedPost, parsedPost, parsedPost] as any;
-
     it('should set gifs on initial load from gifs subreddit', () => {
       const request = httpMock.expectOne(
         'https://www.reddit.com/r/gifs/hot/.json?limit=100'
