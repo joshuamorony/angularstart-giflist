@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -59,20 +59,35 @@ describe('RedditService', () => {
   });
 
   describe('source: subredditChanged$', () => {
-    it('should load data from specified subreddit when form control changes', () => {
-      const altMockData = [mockPost, mockPost];
+    it('should load data from specified subreddit when form control changes', fakeAsync(() => {
+      // initial load
+      const requestOne = httpMock.expectOne(
+        'https://www.reddit.com/r/gifs/hot/.json?limit=100'
+      );
+      requestOne.flush(mockData);
+
+      const altMockData = {
+        data: {
+          children: [mockPost, mockPost],
+        },
+      };
+
       const expectedResults = [parsedPost, parsedPost] as any;
 
       const testValue = 'funny';
       service.subredditFormControl.setValue(testValue);
 
-      const request = httpMock.expectOne(
+      // wait for debounce time
+      tick(300);
+
+      const requestTwo = httpMock.expectOne(
         `https://www.reddit.com/r/${testValue}/hot/.json?limit=100`
       );
-      request.flush(altMockData);
+      requestTwo.flush(altMockData);
+      tick();
 
       expect(service.gifs()).toEqual(expectedResults);
-    });
+    }));
   });
 
   describe('source: gifsLoaded$', () => {
