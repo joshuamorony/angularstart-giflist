@@ -5,7 +5,8 @@ import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { GifListComponent } from './ui/gif-list.component';
 import { MockGifListComponent } from './ui/gif-list.component.spec';
-import { FormControl } from '@angular/forms';
+import { SearchBarComponent } from './ui/search-bar.component';
+import { MockSearchBarComponent } from './ui/search-bar.component.spec';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -28,8 +29,8 @@ describe('HomeComponent', () => {
       ],
     })
       .overrideComponent(HomeComponent, {
-        remove: { imports: [GifListComponent] },
-        add: { imports: [MockGifListComponent] },
+        remove: { imports: [GifListComponent, SearchBarComponent] },
+        add: { imports: [MockGifListComponent, MockSearchBarComponent] },
       })
       .compileComponents();
 

@@ -3,6 +3,17 @@ import { SearchBarComponent } from './search-bar.component';
 import { By } from '@angular/platform-browser';
 import { FormControl } from '@angular/forms';
 
+import { Component, Input } from '@angular/core';
+
+@Component({
+  standalone: true,
+  selector: 'app-search-bar',
+  template: ` <p>Hello world</p> `,
+})
+export class MockSearchBarComponent {
+  @Input({ required: true }) subredditFormControl: any;
+}
+
 describe('SearchBarComponent', () => {
   let component: SearchBarComponent;
   let fixture: ComponentFixture<SearchBarComponent>;
