@@ -5,12 +5,14 @@ import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { GifListComponent } from './ui/gif-list.component';
 import { MockGifListComponent } from './ui/gif-list.component.spec';
+import { FormControl } from '@angular/forms';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
 
   const testGifs = [{}, {}, {}];
+  const testControl = {};
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -20,6 +22,7 @@ describe('HomeComponent', () => {
           provide: RedditService,
           useValue: {
             gifs: jest.fn().mockReturnValue(testGifs),
+            subredditFormControl: testControl,
           },
         },
       ],
@@ -37,6 +40,22 @@ describe('HomeComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('app-search-bar', () => {
+    let searchBar: DebugElement;
+
+    beforeEach(() => {
+      searchBar = fixture.debugElement.query(By.css('app-search-bar'));
+    });
+
+    describe('input: subredditFormControl', () => {
+      it('should supply the subredditFormControl from reddit service', () => {
+        expect(searchBar.componentInstance.subredditFormControl).toEqual(
+          testControl
+        );
+      });
+    });
   });
 
   describe('app-gif-list', () => {
