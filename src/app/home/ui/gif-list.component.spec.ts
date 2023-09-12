@@ -89,7 +89,7 @@ describe('GifListComponent', () => {
 
   describe('title bar', () => {
     it('should launch the permalink when comments clicked', () => {
-      const testLink = 'https://google.com';
+      const testLink = 'abc';
       const testData = [{ permalink: testLink }] as any;
       const window = TestBed.inject(WINDOW);
 
@@ -97,11 +97,13 @@ describe('GifListComponent', () => {
 
       fixture.detectChanges();
 
-      const link = fixture.debugElement.query(By.css('a'));
+      const link = fixture.debugElement.query(By.css('button'));
 
       link.nativeElement.click();
 
-      expect(window.open).toHaveBeenCalledWith(testLink);
+      expect(window.open).toHaveBeenCalledWith(
+        'https://reddit.com/' + testLink
+      );
     });
   });
 });
