@@ -1,11 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, InjectionToken, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { GifPlayerComponent } from './gif-player.component';
 import { Gif } from 'src/app/shared/interfaces';
-
-export const WINDOW = new InjectionToken<Window>('The window object', {
-  factory: () => window,
-});
 
 @Component({
   standalone: true,

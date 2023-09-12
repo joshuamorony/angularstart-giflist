@@ -1,11 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GifListComponent, WINDOW } from './gif-list.component';
+import { GifListComponent } from './gif-list.component';
 import { By } from '@angular/platform-browser';
 import { GifPlayerComponent } from './gif-player.component';
 import { MockGifPlayerComponent } from './gif-player.component.spec';
 
 import { Component, Input } from '@angular/core';
 import { Gif } from 'src/app/shared/interfaces';
+import { WINDOW } from 'src/app/shared/utils/injection-tokens';
 
 @Component({
   standalone: true,
