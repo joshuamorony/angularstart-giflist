@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject } from 'rxjs';
 
 interface GifPlayerState {
@@ -20,12 +21,17 @@ interface GifPlayerState {
   standalone: true,
   selector: 'app-gif-player',
   template: `
+    <mat-progress-spinner
+      *ngIf="status() === 'loading'"
+      mode="indeterminate"
+      diameter="50"
+    />
     <div
       [style.background]="'url(' + thumbnail + ') 50% 50% / cover no-repeat'"
       [ngStyle]="
-        !(status() === 'loaded')
+        status() !== 'loaded'
           ? {
-              filter: 'blur(3px) brightness(0.6)',
+              filter: 'blur(10px) brightness(0.6)',
               transform: 'scale(1.1)'
             }
           : {}
@@ -46,6 +52,10 @@ interface GifPlayerState {
   `,
   styles: [
     `
+      :host {
+        position: relative;
+      }
+
       .preload-background {
         width: 100%;
         height: auto;
@@ -57,9 +67,16 @@ interface GifPlayerState {
         margin: auto;
         background: transparent;
       }
+
+      mat-progress-spinner {
+        position: absolute;
+        top: 2em;
+        right: 2em;
+        z-index: 1;
+      }
     `,
   ],
-  imports: [CommonModule],
+  imports: [CommonModule, MatProgressSpinnerModule],
 })
 export class GifPlayerComponent {
   @Input({ required: true }) src!: string;
