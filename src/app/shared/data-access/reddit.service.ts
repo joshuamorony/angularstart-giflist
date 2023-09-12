@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { Gif, RedditPost, RedditResponse } from '../interfaces';
+import { FormControl } from '@angular/forms';
 
 export interface GifsState {
   gifs: Gif[];
@@ -10,6 +11,8 @@ export interface GifsState {
 @Injectable({ providedIn: 'root' })
 export class RedditService {
   http = inject(HttpClient);
+
+  subredditFormControl = new FormControl();
 
   // state
   state = signal<GifsState>({
