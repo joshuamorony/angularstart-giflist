@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GifListComponent } from './gif-list.component';
+import { GifListComponent, WINDOW } from './gif-list.component';
 import { By } from '@angular/platform-browser';
 import { GifPlayerComponent } from './gif-player.component';
 import { MockGifPlayerComponent } from './gif-player.component.spec';
@@ -23,6 +23,14 @@ describe('GifListComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [GifListComponent],
+      providers: [
+        {
+          provide: WINDOW,
+          useValue: {
+            open: jest.fn(),
+          },
+        },
+      ],
     })
       .overrideComponent(GifListComponent, {
         remove: { imports: [GifPlayerComponent] },
@@ -75,6 +83,24 @@ describe('GifListComponent', () => {
       const player = fixture.debugElement.query(By.css('app-gif-player'));
 
       expect(player.componentInstance.thumbnail).toEqual(testThumb);
+    });
+  });
+
+  describe('title bar', () => {
+    it('should launch the permalink when comments clicked', () => {
+      const testLink = 'https://google.com';
+      const testData = [{ permalink: testLink }] as any;
+      const window = TestBed.inject(WINDOW);
+
+      component.gifs = testData;
+
+      fixture.detectChanges();
+
+      const link = fixture.debugElement.query(By.css('a'));
+
+      link.nativeElement.click();
+
+      expect(window.open).toHaveBeenCalledWith(testLink);
     });
   });
 });
