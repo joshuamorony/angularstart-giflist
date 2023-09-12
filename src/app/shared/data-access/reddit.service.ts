@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { Gif, RedditPost, RedditResponse } from '../interfaces';
 import { FormControl } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, startWith, switchMap } from 'rxjs';
 
 export interface GifsState {
   gifs: Gif[];
@@ -23,8 +24,18 @@ export class RedditService {
   gifs = computed(() => this.state().gifs);
 
   //sources
-  gifsLoaded$ = this.http.get<RedditResponse>(
-    'https://www.reddit.com/r/gifs/hot/.json?limit=100'
+  subredditChanged$ = this.subredditFormControl.valueChanges.pipe(
+    debounceTime(300),
+    distinctUntilChanged(),
+    startWith('gifs')
+  );
+
+  gifsLoaded$ = this.subredditChanged$.pipe(
+    switchMap((subreddit) =>
+      this.http.get<RedditResponse>(
+        `https://www.reddit.com/r/${subreddit}/hot/.json?limit=100`
+      )
+    )
   );
 
   constructor() {
