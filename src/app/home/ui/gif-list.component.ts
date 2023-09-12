@@ -36,13 +36,6 @@ import { WINDOW } from 'src/app/shared/utils/injection-tokens';
     MatIconModule,
     MatButtonModule,
   ],
-  styles: [
-    `
-      .toolbar-spacer {
-        flex: 1 1 auto;
-      }
-    `,
-  ],
 })
 export class GifListComponent {
   @Input({ required: true }) gifs!: Gif[];

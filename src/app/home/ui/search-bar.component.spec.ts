@@ -4,6 +4,7 @@ import { By } from '@angular/platform-browser';
 import { FormControl } from '@angular/forms';
 
 import { Component, Input } from '@angular/core';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 @Component({
   standalone: true,
@@ -20,7 +21,7 @@ describe('SearchBarComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [SearchBarComponent],
+      imports: [SearchBarComponent, NoopAnimationsModule],
     })
       .overrideComponent(SearchBarComponent, {
         remove: { imports: [] },
