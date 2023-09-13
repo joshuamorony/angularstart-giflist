@@ -62,7 +62,7 @@ describe('RedditService', () => {
     it('should load data from specified subreddit when form control changes', fakeAsync(() => {
       // initial load
       const requestOne = httpMock.expectOne(
-        'https://www.reddit.com/r/gifs/hot/.json?limit=100'
+        'https://www.reddit.com/r/gifs/hot/.json?limit=20'
       );
       requestOne.flush(mockData);
 
@@ -81,7 +81,7 @@ describe('RedditService', () => {
       tick(300);
 
       const requestTwo = httpMock.expectOne(
-        `https://www.reddit.com/r/${testValue}/hot/.json?limit=100`
+        `https://www.reddit.com/r/${testValue}/hot/.json?limit=20`
       );
       requestTwo.flush(altMockData);
       tick();
@@ -92,7 +92,7 @@ describe('RedditService', () => {
     it('should continue to allow subreddit switching after an error', fakeAsync(() => {
       // initial load
       const requestOne = httpMock.expectOne(
-        'https://www.reddit.com/r/gifs/hot/.json?limit=100'
+        'https://www.reddit.com/r/gifs/hot/.json?limit=20'
       );
       requestOne.flush('', { status: 404, statusText: 'Not Found' });
 
@@ -111,7 +111,7 @@ describe('RedditService', () => {
       tick(300);
 
       const requestTwo = httpMock.expectOne(
-        `https://www.reddit.com/r/${testValue}/hot/.json?limit=100`
+        `https://www.reddit.com/r/${testValue}/hot/.json?limit=20`
       );
       requestTwo.flush(altMockData);
       tick();
@@ -123,7 +123,7 @@ describe('RedditService', () => {
   describe('source: gifsLoaded$', () => {
     it('should set gifs on initial load from gifs subreddit', () => {
       const request = httpMock.expectOne(
-        'https://www.reddit.com/r/gifs/hot/.json?limit=100'
+        'https://www.reddit.com/r/gifs/hot/.json?limit=20'
       );
       request.flush(mockData);
 
