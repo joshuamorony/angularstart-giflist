@@ -88,6 +88,36 @@ describe('RedditService', () => {
 
       expect(service.gifs()).toEqual(expectedResults);
     }));
+
+    it('should continue to allow subreddit switching after an error', fakeAsync(() => {
+      // initial load
+      const requestOne = httpMock.expectOne(
+        'https://www.reddit.com/r/gifs/hot/.json?limit=100'
+      );
+      requestOne.flush('', { status: 404, statusText: 'Not Found' });
+
+      const altMockData = {
+        data: {
+          children: [mockPost, mockPost],
+        },
+      };
+
+      const expectedResults = [parsedPost, parsedPost] as any;
+
+      const testValue = 'funny';
+      service.subredditFormControl.setValue(testValue);
+
+      // wait for debounce time
+      tick(300);
+
+      const requestTwo = httpMock.expectOne(
+        `https://www.reddit.com/r/${testValue}/hot/.json?limit=100`
+      );
+      requestTwo.flush(altMockData);
+      tick();
+
+      expect(service.gifs()).toEqual(expectedResults);
+    }));
   });
 
   describe('source: gifsLoaded$', () => {
