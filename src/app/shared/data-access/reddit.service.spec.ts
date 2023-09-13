@@ -9,6 +9,8 @@ describe('RedditService', () => {
   let service: RedditService;
   let httpMock: HttpTestingController;
 
+  const apiUrl = 'https://www.reddit.com/r/gifs/hot/.json?limit=20';
+
   const mockPost = {
     data: {
       url: 'test.mp4',
@@ -61,9 +63,7 @@ describe('RedditService', () => {
   describe('source: subredditChanged$', () => {
     it('should load data from specified subreddit when form control changes', fakeAsync(() => {
       // initial load
-      const requestOne = httpMock.expectOne(
-        'https://www.reddit.com/r/gifs/hot/.json?limit=20'
-      );
+      const requestOne = httpMock.expectOne(apiUrl);
       requestOne.flush(mockData);
 
       const altMockData = {
@@ -80,9 +80,7 @@ describe('RedditService', () => {
       // wait for debounce time
       tick(300);
 
-      const requestTwo = httpMock.expectOne(
-        `https://www.reddit.com/r/${testValue}/hot/.json?limit=20`
-      );
+      const requestTwo = httpMock.expectOne(apiUrl.replace('gifs', testValue));
       requestTwo.flush(altMockData);
       tick();
 
@@ -91,9 +89,7 @@ describe('RedditService', () => {
 
     it('should continue to allow subreddit switching after an error', fakeAsync(() => {
       // initial load
-      const requestOne = httpMock.expectOne(
-        'https://www.reddit.com/r/gifs/hot/.json?limit=20'
-      );
+      const requestOne = httpMock.expectOne(apiUrl);
       requestOne.flush('', { status: 404, statusText: 'Not Found' });
 
       const altMockData = {
@@ -110,21 +106,23 @@ describe('RedditService', () => {
       // wait for debounce time
       tick(300);
 
-      const requestTwo = httpMock.expectOne(
-        `https://www.reddit.com/r/${testValue}/hot/.json?limit=20`
-      );
+      const requestTwo = httpMock.expectOne(apiUrl.replace('gifs', testValue));
       requestTwo.flush(altMockData);
       tick();
 
       expect(service.gifs()).toEqual(expectedResults);
     }));
+
+    it('should set error state if the fetch errors', () => {
+      const requestOne = httpMock.expectOne(apiUrl);
+      requestOne.flush('', { status: 404, statusText: 'Not Found' });
+      expect(service.error()).toEqual('Failed to load gifs for /r/gifs');
+    });
   });
 
   describe('source: gifsLoaded$', () => {
     it('should set gifs on initial load from gifs subreddit', () => {
-      const request = httpMock.expectOne(
-        'https://www.reddit.com/r/gifs/hot/.json?limit=20'
-      );
+      const request = httpMock.expectOne(apiUrl);
       request.flush(mockData);
 
       expect(service.gifs()).toEqual(expectedResults);

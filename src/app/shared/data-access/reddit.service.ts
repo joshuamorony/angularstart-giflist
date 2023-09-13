@@ -29,6 +29,7 @@ export class RedditService {
 
   // selectors
   gifs = computed(() => this.state().gifs);
+  error = computed(() => '');
 
   //sources
   subredditChanged$ = this.subredditFormControl.valueChanges.pipe(
