@@ -41,7 +41,9 @@ describe('AppComponent', () => {
       const testError = 'some error';
       mockErrorSignal.set(testError);
 
-      expect(snackBar.open).toHaveBeenCalledWith(testError);
+      expect(snackBar.open).toHaveBeenCalledWith(testError, 'Dismiss', {
+        duration: 2000,
+      });
     });
     it('should not open snack bar for null error messages', () => {
       const testError = 'some error';
