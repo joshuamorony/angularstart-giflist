@@ -4,6 +4,7 @@ import { RedditService } from '../shared/data-access/reddit.service';
 import { SearchBarComponent } from './ui/search-bar.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CommonModule } from '@angular/common';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 @Component({
   standalone: true,
@@ -15,6 +16,8 @@ import { CommonModule } from '@angular/common';
     <app-gif-list
       *ngIf="!redditService.loading()"
       [gifs]="redditService.gifs()"
+      infiniteScroll
+      (scrolled)="redditService.pagination$.next()"
       class="grid-container"
     />
     <mat-progress-spinner
@@ -27,6 +30,7 @@ import { CommonModule } from '@angular/common';
     GifListComponent,
     SearchBarComponent,
     MatProgressSpinnerModule,
+    InfiniteScrollModule,
     CommonModule,
   ],
   styles: [
