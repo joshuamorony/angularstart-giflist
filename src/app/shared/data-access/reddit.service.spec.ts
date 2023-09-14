@@ -60,6 +60,21 @@ describe('RedditService', () => {
     expect(service).toBeTruthy();
   });
 
+  describe('source: pagination$', () => {
+    it('should trigger a request using the last gifs name as the after value', () => {
+      const request = httpMock.expectOne(apiUrl);
+      request.flush(mockData);
+
+      const gifs = service.gifs();
+      const expectedAfter = gifs[gifs.length - 1].name;
+
+      service.pagination$.next();
+
+      const requestTwo = httpMock.expectOne(apiUrl + '&after=' + expectedAfter);
+      requestTwo.flush(mockData);
+    });
+  });
+
   describe('source: subredditChanged$', () => {
     it('should set loading state to true until complete', () => {
       expect(service.loading()).toEqual(true);
