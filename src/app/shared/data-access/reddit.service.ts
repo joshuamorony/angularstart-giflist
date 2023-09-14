@@ -9,6 +9,8 @@ import {
   catchError,
   debounceTime,
   distinctUntilChanged,
+  expand,
+  map,
   startWith,
   switchMap,
 } from 'rxjs';
@@ -24,6 +26,7 @@ export class RedditService {
   http = inject(HttpClient);
 
   subredditFormControl = new FormControl();
+  gifsPerPage = 20;
 
   // state
   state = signal<GifsState>({
@@ -48,16 +51,27 @@ export class RedditService {
 
   gifsLoaded$ = this.subredditChanged$.pipe(
     switchMap((subreddit) =>
-      this.http
-        .get<RedditResponse>(
-          `https://www.reddit.com/r/${subreddit}/hot/.json?limit=20`
-        )
-        .pipe(
-          catchError((err) => {
-            this.handleError(err);
-            return EMPTY;
-          })
-        )
+      this.fetchFromReddit(subreddit, null, this.gifsPerPage).pipe(
+        // A single request might not give us enough valid gifs for a
+        // full page, as not every post is a valid gif
+        // Keep fetching more data until we do have enough for a page
+        expand((response, index) => {
+          const { gifs, gifsRequired } = response;
+          const remainingGifsToFetch = gifsRequired - gifs.length;
+          const maxAttempts = 10;
+
+          const shouldKeepTrying =
+            remainingGifsToFetch > 0 && index < maxAttempts;
+
+          return shouldKeepTrying
+            ? this.fetchFromReddit(
+                subreddit,
+                gifs[gifs.length - 1].name,
+                remainingGifsToFetch
+              )
+            : EMPTY;
+        })
+      )
     )
   );
 
@@ -70,7 +84,7 @@ export class RedditService {
     this.gifsLoaded$.pipe(takeUntilDestroyed()).subscribe((response) =>
       this.state.update((state) => ({
         ...state,
-        gifs: this.convertRedditPostsToGifs(response.data.children),
+        gifs: response.gifs,
         loading: false,
       }))
     );
@@ -81,6 +95,28 @@ export class RedditService {
         error,
       }))
     );
+  }
+
+  private fetchFromReddit(
+    subreddit: string,
+    after: string | null,
+    gifsRequired: number
+  ) {
+    return this.http
+      .get<RedditResponse>(
+        `https://www.reddit.com/r/${subreddit}/hot/.json?limit=50` +
+          (after ? `&after=${after}` : '')
+      )
+      .pipe(
+        catchError((err) => {
+          this.handleError(err);
+          return EMPTY;
+        }),
+        map((response) => ({
+          gifs: this.convertRedditPostsToGifs(response.data.children),
+          gifsRequired,
+        }))
+      );
   }
 
   private handleError(err: HttpErrorResponse) {
