@@ -12,15 +12,15 @@ import { CommonModule } from '@angular/common';
     <app-search-bar
       [subredditFormControl]="redditService.subredditFormControl"
     ></app-search-bar>
-    <mat-progress-spinner
-      *ngIf="redditService.loading()"
-      mode="indeterminate"
-      diameter="50"
-    />
     <app-gif-list
       *ngIf="!redditService.loading()"
       [gifs]="redditService.gifs()"
       class="grid-container"
+    />
+    <mat-progress-spinner
+      *ngIf="redditService.loading()"
+      mode="indeterminate"
+      diameter="50"
     />
   `,
   imports: [
@@ -28,6 +28,13 @@ import { CommonModule } from '@angular/common';
     SearchBarComponent,
     MatProgressSpinnerModule,
     CommonModule,
+  ],
+  styles: [
+    `
+      mat-progress-spinner {
+        margin: 2rem auto;
+      }
+    `,
   ],
 })
 export default class HomeComponent {
