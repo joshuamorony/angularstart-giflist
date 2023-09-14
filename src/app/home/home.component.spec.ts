@@ -7,6 +7,7 @@ import { GifListComponent } from './ui/gif-list.component';
 import { MockGifListComponent } from './ui/gif-list.component.spec';
 import { SearchBarComponent } from './ui/search-bar.component';
 import { MockSearchBarComponent } from './ui/search-bar.component.spec';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -39,6 +40,7 @@ describe('HomeComponent', () => {
 
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
+    mockLoadingSignal.set(true);
     fixture.detectChanges();
   });
 
@@ -66,6 +68,8 @@ describe('HomeComponent', () => {
     let gifList: DebugElement;
 
     beforeEach(() => {
+      mockLoadingSignal.set(false);
+      fixture.detectChanges();
       gifList = fixture.debugElement.query(By.css('app-gif-list'));
     });
 
@@ -75,12 +79,18 @@ describe('HomeComponent', () => {
       });
 
       it('should display spinner instead of app-gif-list if loading state is true', () => {
-        const spinner = fixture.debugElement.query(
+        mockLoadingSignal.set(true);
+        fixture.detectChanges();
+
+        const spinnerBefore = fixture.debugElement.query(
           By.css('mat-progress-spinner')
         );
+        const gifListBefore = fixture.debugElement.query(
+          By.css('app-gif-list')
+        );
 
-        expect(gifList).toBeFalsy();
-        expect(spinner).toBeTruthy();
+        expect(gifListBefore).toBeFalsy();
+        expect(spinnerBefore).toBeTruthy();
 
         mockLoadingSignal.set(false);
         fixture.detectChanges();
