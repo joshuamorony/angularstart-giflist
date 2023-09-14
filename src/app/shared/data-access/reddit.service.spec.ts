@@ -61,6 +61,15 @@ describe('RedditService', () => {
   });
 
   describe('source: subredditChanged$', () => {
+    it('should set loading state to true until complete', () => {
+      expect(service.loading()).toEqual(true);
+
+      const request = httpMock.expectOne(apiUrl);
+      request.flush(mockData);
+
+      expect(service.loading()).toEqual(false);
+    });
+
     it('should load data from specified subreddit when form control changes', fakeAsync(() => {
       // initial load
       const requestOne = httpMock.expectOne(apiUrl);

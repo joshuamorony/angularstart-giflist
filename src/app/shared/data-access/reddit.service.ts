@@ -16,6 +16,7 @@ import {
 export interface GifsState {
   gifs: Gif[];
   error: string | null;
+  loading: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -28,11 +29,13 @@ export class RedditService {
   state = signal<GifsState>({
     gifs: [],
     error: null,
+    loading: true,
   });
 
   // selectors
   gifs = computed(() => this.state().gifs);
   error = computed(() => this.state().error);
+  loading = computed(() => this.state().loading);
 
   //sources
   error$ = new Subject<string | null>();
