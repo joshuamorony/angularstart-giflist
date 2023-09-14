@@ -14,7 +14,6 @@ import {
   map,
   startWith,
   switchMap,
-  tap,
 } from 'rxjs';
 
 export interface GifsState {
@@ -55,10 +54,12 @@ export class RedditService {
   gifsLoaded$ = this.subredditChanged$.pipe(
     switchMap((subreddit) =>
       this.pagination$.pipe(
-        startWith(null),
+        startWith(undefined),
         concatMap(() => {
-          const gifs = this.gifs();
-          const fetchAfterGif = gifs.length ? gifs[gifs.length - 1].name : null;
+          const currentGifs = this.gifs();
+          const fetchAfterGif = currentGifs.length
+            ? currentGifs[currentGifs.length - 1].name
+            : null;
 
           return this.fetchFromReddit(
             subreddit,
@@ -71,15 +72,21 @@ export class RedditService {
             expand((response, index) => {
               const { gifs, gifsRequired } = response;
               const remainingGifsToFetch = gifsRequired - gifs.length;
-              const maxAttempts = 10;
+              const maxAttempts = 15;
+
+              const newFetchAfterGif = gifs.length
+                ? gifs[gifs.length - 1].name
+                : null;
 
               const shouldKeepTrying =
-                remainingGifsToFetch > 0 && index < maxAttempts;
+                remainingGifsToFetch > 0 &&
+                index < maxAttempts &&
+                newFetchAfterGif !== null;
 
               return shouldKeepTrying
                 ? this.fetchFromReddit(
                     subreddit,
-                    gifs[gifs.length - 1].name,
+                    newFetchAfterGif,
                     remainingGifsToFetch
                   )
                 : EMPTY;
