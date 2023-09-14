@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
+  let redditService: RedditService;
 
   const testGifs = [{}, {}, {}];
   const testControl = {};
@@ -28,6 +29,9 @@ describe('HomeComponent', () => {
             gifs: jest.fn().mockReturnValue(testGifs),
             loading: mockLoadingSignal,
             subredditFormControl: testControl,
+            pagination$: {
+              next: jest.fn(),
+            },
           },
         },
       ],
@@ -40,6 +44,7 @@ describe('HomeComponent', () => {
 
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
+    redditService = TestBed.inject(RedditService);
     mockLoadingSignal.set(true);
     fixture.detectChanges();
   });
@@ -71,6 +76,13 @@ describe('HomeComponent', () => {
       mockLoadingSignal.set(false);
       fixture.detectChanges();
       gifList = fixture.debugElement.query(By.css('app-gif-list'));
+    });
+
+    describe('output: scrolled', () => {
+      it('should next the pagination$ source', () => {
+        gifList.triggerEventHandler('scrolled', null);
+        expect(redditService.pagination$.next).toHaveBeenCalled();
+      });
     });
 
     describe('input: gifs', () => {
