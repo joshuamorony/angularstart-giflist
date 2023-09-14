@@ -7,12 +7,14 @@ import {
   EMPTY,
   Subject,
   catchError,
+  concatMap,
   debounceTime,
   distinctUntilChanged,
   expand,
   map,
   startWith,
   switchMap,
+  tap,
 } from 'rxjs';
 
 export interface GifsState {
@@ -42,6 +44,7 @@ export class RedditService {
 
   //sources
   error$ = new Subject<string | null>();
+  pagination$ = new Subject<void>();
 
   subredditChanged$ = this.subredditFormControl.valueChanges.pipe(
     debounceTime(300),
@@ -51,25 +54,37 @@ export class RedditService {
 
   gifsLoaded$ = this.subredditChanged$.pipe(
     switchMap((subreddit) =>
-      this.fetchFromReddit(subreddit, null, this.gifsPerPage).pipe(
-        // A single request might not give us enough valid gifs for a
-        // full page, as not every post is a valid gif
-        // Keep fetching more data until we do have enough for a page
-        expand((response, index) => {
-          const { gifs, gifsRequired } = response;
-          const remainingGifsToFetch = gifsRequired - gifs.length;
-          const maxAttempts = 10;
+      this.pagination$.pipe(
+        startWith(null),
+        concatMap(() => {
+          const gifs = this.gifs();
+          const fetchAfterGif = gifs.length ? gifs[gifs.length - 1].name : null;
 
-          const shouldKeepTrying =
-            remainingGifsToFetch > 0 && index < maxAttempts;
+          return this.fetchFromReddit(
+            subreddit,
+            fetchAfterGif,
+            this.gifsPerPage
+          ).pipe(
+            // A single request might not give us enough valid gifs for a
+            // full page, as not every post is a valid gif
+            // Keep fetching more data until we do have enough for a page
+            expand((response, index) => {
+              const { gifs, gifsRequired } = response;
+              const remainingGifsToFetch = gifsRequired - gifs.length;
+              const maxAttempts = 10;
 
-          return shouldKeepTrying
-            ? this.fetchFromReddit(
-                subreddit,
-                gifs[gifs.length - 1].name,
-                remainingGifsToFetch
-              )
-            : EMPTY;
+              const shouldKeepTrying =
+                remainingGifsToFetch > 0 && index < maxAttempts;
+
+              return shouldKeepTrying
+                ? this.fetchFromReddit(
+                    subreddit,
+                    gifs[gifs.length - 1].name,
+                    remainingGifsToFetch
+                  )
+                : EMPTY;
+            })
+          );
         })
       )
     )
@@ -78,13 +93,13 @@ export class RedditService {
   constructor() {
     //reducers
     this.subredditChanged$.pipe(takeUntilDestroyed()).subscribe(() => {
-      this.state.update((state) => ({ ...state, loading: true }));
+      this.state.update((state) => ({ ...state, loading: true, gifs: [] }));
     });
 
     this.gifsLoaded$.pipe(takeUntilDestroyed()).subscribe((response) =>
       this.state.update((state) => ({
         ...state,
-        gifs: response.gifs,
+        gifs: [...state.gifs, ...response.gifs],
         loading: false,
       }))
     );
