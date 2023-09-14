@@ -1,10 +1,11 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RedditService } from './shared/data-access/reddit.service';
 import { signal } from '@angular/core';
 
 describe('AppComponent', () => {
+  let fixture: ComponentFixture<AppComponent>;
   const mockErrorSignal = signal<string | null>(null);
   let snackBar: MatSnackBar;
 
@@ -28,10 +29,10 @@ describe('AppComponent', () => {
     });
 
     snackBar = TestBed.inject(MatSnackBar);
+    fixture = TestBed.createComponent(AppComponent);
   });
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
@@ -41,6 +42,8 @@ describe('AppComponent', () => {
       const testError = 'some error';
       mockErrorSignal.set(testError);
 
+      fixture.detectChanges();
+
       expect(snackBar.open).toHaveBeenCalledWith(testError, 'Dismiss', {
         duration: 2000,
       });
@@ -48,7 +51,9 @@ describe('AppComponent', () => {
     it('should not open snack bar for null error messages', () => {
       const testError = 'some error';
       mockErrorSignal.set(testError);
+      fixture.detectChanges();
       mockErrorSignal.set(null);
+      fixture.detectChanges();
 
       expect(snackBar.open).toHaveBeenCalledTimes(1);
     });
