@@ -1,10 +1,11 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Gif, RedditPost, RedditResponse } from '../interfaces';
 import { FormControl } from '@angular/forms';
 import {
   EMPTY,
+  Subject,
   catchError,
   debounceTime,
   distinctUntilChanged,
@@ -14,6 +15,7 @@ import {
 
 export interface GifsState {
   gifs: Gif[];
+  error: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -25,13 +27,16 @@ export class RedditService {
   // state
   state = signal<GifsState>({
     gifs: [],
+    error: null,
   });
 
   // selectors
   gifs = computed(() => this.state().gifs);
-  error = computed(() => '');
+  error = computed(() => this.state().error);
 
   //sources
+  error$ = new Subject<string | null>();
+
   subredditChanged$ = this.subredditFormControl.valueChanges.pipe(
     debounceTime(300),
     distinctUntilChanged(),
@@ -44,7 +49,12 @@ export class RedditService {
         .get<RedditResponse>(
           `https://www.reddit.com/r/${subreddit}/hot/.json?limit=20`
         )
-        .pipe(catchError(() => EMPTY))
+        .pipe(
+          catchError((err) => {
+            this.handleError(err);
+            return EMPTY;
+          })
+        )
     )
   );
 
@@ -56,6 +66,24 @@ export class RedditService {
         gifs: this.convertRedditPostsToGifs(response.data.children),
       }))
     );
+
+    this.error$.pipe(takeUntilDestroyed()).subscribe((error) =>
+      this.state.update((state) => ({
+        ...state,
+        error,
+      }))
+    );
+  }
+
+  private handleError(err: HttpErrorResponse) {
+    // Handle specific error cases
+    if (err.status === 404 && err.url) {
+      this.error$.next(`Failed to load gifs for /r/${err.url.split('/')[4]}`);
+      return;
+    }
+
+    // Generic error if no cases match
+    this.error$.next(err.statusText);
   }
 
   private convertRedditPostsToGifs(posts: RedditPost[]) {
