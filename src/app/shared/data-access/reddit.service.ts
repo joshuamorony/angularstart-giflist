@@ -63,10 +63,15 @@ export class RedditService {
 
   constructor() {
     //reducers
+    this.subredditChanged$.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.state.update((state) => ({ ...state, loading: true }));
+    });
+
     this.gifsLoaded$.pipe(takeUntilDestroyed()).subscribe((response) =>
       this.state.update((state) => ({
         ...state,
         gifs: this.convertRedditPostsToGifs(response.data.children),
+        loading: false,
       }))
     );
 
