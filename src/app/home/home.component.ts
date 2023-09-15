@@ -25,6 +25,12 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
       mode="indeterminate"
       diameter="50"
     />
+    <p
+      *ngIf="!redditService.loading() && !redditService.gifs().length"
+      data-testid="no-gifs"
+    >
+      Can't find any gifs 🤷
+    </p>
   `,
   imports: [
     GifListComponent,
@@ -37,6 +43,13 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     `
       mat-progress-spinner {
         margin: 2rem auto;
+      }
+
+      p {
+        font-size: 2em;
+        width: 100%;
+        text-align: center;
+        margin-top: 4rem;
       }
     `,
   ],
