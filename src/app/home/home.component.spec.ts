@@ -17,6 +17,7 @@ describe('HomeComponent', () => {
   const testGifs = [{}, {}, {}];
   const testControl = {};
 
+  const mockGifsSignal = signal([{}, {}, {}]);
   const mockLoadingSignal = signal(true);
 
   beforeEach(() => {
@@ -26,7 +27,7 @@ describe('HomeComponent', () => {
         {
           provide: RedditService,
           useValue: {
-            gifs: jest.fn().mockReturnValue(testGifs),
+            gifs: mockGifsSignal,
             loading: mockLoadingSignal,
             subredditFormControl: testControl,
             pagination$: {
@@ -46,6 +47,7 @@ describe('HomeComponent', () => {
     component = fixture.componentInstance;
     redditService = TestBed.inject(RedditService);
     mockLoadingSignal.set(true);
+    mockGifsSignal.set([{}, {}, {}]);
     fixture.detectChanges();
   });
 
@@ -66,6 +68,20 @@ describe('HomeComponent', () => {
           testControl
         );
       });
+    });
+  });
+
+  describe('no-gifs', () => {
+    it('should display no gifs message if not loading and no gifs', () => {
+      mockGifsSignal.set([]);
+      mockLoadingSignal.set(false);
+      fixture.detectChanges();
+
+      const result = fixture.debugElement.query(
+        By.css('[data-testid="no-gifs"]')
+      );
+
+      expect(result).toBeTruthy();
     });
   });
 
