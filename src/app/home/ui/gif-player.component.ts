@@ -56,6 +56,7 @@ interface GifPlayerState {
         display: block;
         position: relative;
         overflow: hidden;
+        max-height: 80vh;
       }
 
       .preload-background {
@@ -65,6 +66,7 @@ interface GifPlayerState {
 
       video {
         width: 100%;
+        max-height: 80vh;
         height: auto;
         margin: auto;
         background: transparent;
