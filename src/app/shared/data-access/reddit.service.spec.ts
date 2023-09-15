@@ -9,7 +9,7 @@ describe('RedditService', () => {
   let service: RedditService;
   let httpMock: HttpTestingController;
 
-  const apiUrl = 'https://www.reddit.com/r/gifs/hot/.json?limit=50';
+  const apiUrl = 'https://www.reddit.com/r/gifs/hot/.json?limit=100';
 
   const mockPost = {
     data: {

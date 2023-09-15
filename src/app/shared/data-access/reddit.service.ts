@@ -126,7 +126,7 @@ export class RedditService {
   ) {
     return this.http
       .get<RedditResponse>(
-        `https://www.reddit.com/r/${subreddit}/hot/.json?limit=50` +
+        `https://www.reddit.com/r/${subreddit}/hot/.json?limit=100` +
           (after ? `&after=${after}` : '')
       )
       .pipe(
