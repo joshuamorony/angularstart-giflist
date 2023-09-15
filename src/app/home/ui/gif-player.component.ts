@@ -42,7 +42,6 @@ interface GifPlayerState {
         (click)="togglePlay$.next()"
         #gifPlayer
         playsinline
-        poster="none"
         preload="none"
         [loop]="true"
         [muted]="true"
