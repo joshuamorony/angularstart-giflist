@@ -16,5 +16,11 @@ body {
 .grid-container {
   display: grid;
   align-items: center;
-  grid-template-columns: repeat(auto-fit, minmax(650px, 1fr));
+  grid-template-columns: 1;
+}
+
+@media (min-width: 600px) {
+  .grid-container {
+    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  }
 }
