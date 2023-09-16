@@ -25,13 +25,13 @@ export interface GifsState {
 
 @Injectable({ providedIn: 'root' })
 export class RedditService {
-  http = inject(HttpClient);
+  private http = inject(HttpClient);
+  private gifsPerPage = 20;
 
   subredditFormControl = new FormControl();
-  gifsPerPage = 20;
 
   // state
-  state = signal<GifsState>({
+  private state = signal<GifsState>({
     gifs: [],
     error: null,
     loading: true,
@@ -45,16 +45,16 @@ export class RedditService {
   lastKnownGif = computed(() => this.state().lastKnownGif);
 
   //sources
-  error$ = new Subject<string | null>();
   pagination$ = new Subject<void>();
+  private error$ = new Subject<string | null>();
 
-  subredditChanged$ = this.subredditFormControl.valueChanges.pipe(
+  private subredditChanged$ = this.subredditFormControl.valueChanges.pipe(
     debounceTime(300),
     distinctUntilChanged(),
     startWith('gifs')
   );
 
-  gifsLoaded$ = this.subredditChanged$.pipe(
+  private gifsLoaded$ = this.subredditChanged$.pipe(
     switchMap((subreddit) =>
       this.pagination$.pipe(
         startWith(undefined),
