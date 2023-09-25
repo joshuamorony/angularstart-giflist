@@ -4,13 +4,22 @@ import {
   ElementRef,
   Input,
   ViewChild,
+  AfterViewInit,
   computed,
   effect,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Subject } from 'rxjs';
+import {
+  EMPTY,
+  Subject,
+  combineLatest,
+  filter,
+  fromEvent,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 interface GifPlayerState {
   playing: boolean;
@@ -82,10 +91,17 @@ interface GifPlayerState {
   ],
   imports: [CommonModule, MatProgressSpinnerModule],
 })
-export class GifPlayerComponent {
+export class GifPlayerComponent implements AfterViewInit {
   @Input({ required: true }) src!: string;
   @Input({ required: true }) thumbnail!: string;
   @ViewChild('gifPlayer') video!: ElementRef<HTMLVideoElement>;
+
+  // Fake new signals API
+  videoElement = signal<HTMLVideoElement | undefined>(undefined);
+
+  videoElement$ = toObservable(this.videoElement).pipe(
+    filter((element): element is HTMLVideoElement => !!element)
+  );
 
   state = signal<GifPlayerState>({
     playing: false,
@@ -98,8 +114,22 @@ export class GifPlayerComponent {
 
   // sources
   togglePlay$ = new Subject<void>();
-  videoLoadStart$ = new Subject<void>();
-  videoLoadComplete$ = new Subject<void>();
+
+  // note: unfortunately, checking "playing" is required here as subscribing to the
+  // 'loadstart' event will actually trigger a load, which we don't want unless it
+  // is supposed to be playing
+  videoLoadStart$ = combineLatest([
+    this.videoElement$,
+    toObservable(this.playing),
+  ]).pipe(
+    switchMap(([element, playing]) =>
+      playing ? fromEvent(element, 'loadstart') : EMPTY
+    )
+  );
+
+  videoLoadComplete$ = this.videoElement$.pipe(
+    switchMap((element) => fromEvent(element, 'loadeddata'))
+  );
 
   constructor() {
     //reducers
@@ -122,29 +152,24 @@ export class GifPlayerComponent {
       );
 
     // effects
-    effect(
-      () => {
-        const video = this.video?.nativeElement;
-        const playing = this.playing();
-        const status = this.status();
+    effect(() => {
+      const video = this.videoElement();
+      const playing = this.playing();
+      const status = this.status();
 
-        if (!video) return;
+      if (!video) return;
 
-        if (status === 'initial') {
-          video.addEventListener('loadeddata', () => {
-            this.videoLoadComplete$.next();
-          });
+      if (playing && status === 'initial') {
+        video.load();
+      }
 
-          this.videoLoadStart$.next();
+      if (status === 'loaded') {
+        playing ? video.play() : video.pause();
+      }
+    });
+  }
 
-          video.load();
-        }
-
-        if (status === 'loaded') {
-          playing ? video.play() : video.pause();
-        }
-      },
-      { allowSignalWrites: true }
-    );
+  ngAfterViewInit() {
+    this.videoElement.set(this.video.nativeElement);
   }
 }
