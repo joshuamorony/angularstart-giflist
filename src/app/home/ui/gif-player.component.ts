@@ -91,13 +91,15 @@ interface GifPlayerState {
   ],
   imports: [CommonModule, MatProgressSpinnerModule],
 })
-export class GifPlayerComponent implements AfterViewInit {
+export class GifPlayerComponent {
   @Input({ required: true }) src!: string;
   @Input({ required: true }) thumbnail!: string;
-  @ViewChild('gifPlayer') video!: ElementRef<HTMLVideoElement>;
 
   // Fake new signals API
   videoElement = signal<HTMLVideoElement | undefined>(undefined);
+  @ViewChild('gifPlayer') set video(element: ElementRef<HTMLVideoElement>) {
+    this.videoElement.set(element.nativeElement);
+  }
 
   videoElement$ = toObservable(this.videoElement).pipe(
     filter((element): element is HTMLVideoElement => !!element)
@@ -167,9 +169,5 @@ export class GifPlayerComponent implements AfterViewInit {
         playing ? video.play() : video.pause();
       }
     });
-  }
-
-  ngAfterViewInit() {
-    this.videoElement.set(this.video.nativeElement);
   }
 }
