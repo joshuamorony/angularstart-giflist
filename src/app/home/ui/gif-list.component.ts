@@ -11,7 +11,8 @@ import { WINDOW } from 'src/app/shared/utils/injection-tokens';
   standalone: true,
   selector: 'app-gif-list',
   template: `
-    <div *ngFor="let gif of gifs; trackBy: trackByFn">
+    @for (gif of gifs; track gif.permalink){
+    <div>
       <app-gif-player
         [src]="gif.src"
         [thumbnail]="gif.thumbnail"
@@ -28,6 +29,7 @@ import { WINDOW } from 'src/app/shared/utils/injection-tokens';
         </button>
       </mat-toolbar>
     </div>
+    }
   `,
   imports: [
     CommonModule,

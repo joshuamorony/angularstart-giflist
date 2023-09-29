@@ -30,11 +30,9 @@ interface GifPlayerState {
   standalone: true,
   selector: 'app-gif-player',
   template: `
-    <mat-progress-spinner
-      *ngIf="status() === 'loading'"
-      mode="indeterminate"
-      diameter="50"
-    />
+    @if (status() === 'loading'){
+    <mat-progress-spinner mode="indeterminate" diameter="50" />
+    }
     <div
       [style.background]="'url(' + thumbnail + ') 50% 50% / cover no-repeat'"
       [ngStyle]="
