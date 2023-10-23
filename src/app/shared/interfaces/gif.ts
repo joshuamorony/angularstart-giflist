@@ -6,6 +6,4 @@ export interface Gif {
   title: string;
   thumbnail: string;
   comments: number;
-  loading?: boolean;
-  dataLoaded?: boolean;
 }
