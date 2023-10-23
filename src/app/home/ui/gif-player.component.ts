@@ -4,7 +4,6 @@ import {
   ElementRef,
   Input,
   ViewChild,
-  AfterViewInit,
   computed,
   effect,
   signal,
@@ -18,7 +17,6 @@ import {
   filter,
   fromEvent,
   switchMap,
-  tap,
 } from 'rxjs';
 
 interface GifPlayerState {
