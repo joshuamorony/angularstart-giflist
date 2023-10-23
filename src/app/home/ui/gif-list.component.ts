@@ -29,6 +29,8 @@ import { WINDOW } from 'src/app/shared/utils/injection-tokens';
         </button>
       </mat-toolbar>
     </div>
+    } @empty {
+    <p data-testid="no-gifs">Can't find any gifs 🤷</p>
     }
   `,
   imports: [
@@ -47,6 +49,13 @@ import { WINDOW } from 'src/app/shared/utils/injection-tokens';
 
       mat-toolbar {
         white-space: break-spaces;
+      }
+
+      p {
+        font-size: 2em;
+        width: 100%;
+        text-align: center;
+        margin-top: 4rem;
       }
     `,
   ],
