@@ -55,8 +55,4 @@ export class GifListComponent {
   @Input({ required: true }) gifs!: Gif[];
 
   window = inject(WINDOW);
-
-  trackByFn(_: number, gif: Gif) {
-    return gif.permalink;
-  }
 }
