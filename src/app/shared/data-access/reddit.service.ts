@@ -14,6 +14,7 @@ import {
   map,
   startWith,
   switchMap,
+  tap,
 } from 'rxjs';
 
 export interface GifsState {
@@ -51,7 +52,8 @@ export class RedditService {
   private subredditChanged$ = this.subredditFormControl.valueChanges.pipe(
     debounceTime(300),
     distinctUntilChanged(),
-    startWith('gifs')
+    startWith('gifs'),
+    map((subreddit) => (subreddit.length ? subreddit : 'gifs'))
   );
 
   private gifsLoaded$ = this.subredditChanged$.pipe(
