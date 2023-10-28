@@ -19,7 +19,7 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     <app-gif-list
       [gifs]="redditService.gifs()"
       infiniteScroll
-      (scrolled)="redditService.pagination$.next()"
+      (scrolled)="redditService.pagination$.next(redditService.lastKnownGif())"
       class="grid-container"
     />
     }
