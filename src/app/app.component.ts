@@ -17,7 +17,7 @@ export class AppComponent {
 
   constructor() {
     effect(() => {
-      const error = this.redditService.error();
+      const error = this.redditService.state.error();
 
       if (error !== null) {
         this.snackBar.open(error, 'Dismiss', { duration: 2000 });

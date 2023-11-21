@@ -13,13 +13,15 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
       [subredditFormControl]="redditService.subredditFormControl"
     ></app-search-bar>
 
-    @if (redditService.loading()){
+    @if (redditService.state.loading()){
     <mat-progress-spinner mode="indeterminate" diameter="50" />
     } @else {
     <app-gif-list
-      [gifs]="redditService.gifs()"
+      [gifs]="redditService.state.gifs()"
       infiniteScroll
-      (scrolled)="redditService.pagination$.next()"
+      (scrolled)="
+        redditService.state.pagination(redditService.state.lastKnownGif())
+      "
       class="grid-container"
     />
     }

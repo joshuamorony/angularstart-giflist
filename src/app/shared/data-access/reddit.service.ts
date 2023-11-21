@@ -1,5 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Gif, RedditPost, RedditResponse } from '../interfaces';
 import { FormControl } from '@angular/forms';
@@ -14,7 +13,7 @@ import {
   concatMap,
   catchError,
 } from 'rxjs/operators';
-import { connect } from 'ngxtension/connect';
+import { signalSlice } from 'ngxtension/signal-slice';
 
 export interface GifsState {
   gifs: Gif[];
@@ -26,26 +25,19 @@ export interface GifsState {
 @Injectable({ providedIn: 'root' })
 export class RedditService {
   private http = inject(HttpClient);
-  private gifsPerPage = 20;
 
-  subredditFormControl = new FormControl();
-
-  // state
-  private state = signal<GifsState>({
+  private initialState: GifsState = {
     gifs: [],
     error: null,
     loading: true,
     lastKnownGif: null,
-  });
+  };
+  private gifsPerPage = 20;
 
-  // selectors
-  gifs = computed(() => this.state().gifs);
-  error = computed(() => this.state().error);
-  loading = computed(() => this.state().loading);
-  lastKnownGif = computed(() => this.state().lastKnownGif);
+  subredditFormControl = new FormControl();
 
   //sources
-  pagination$ = new Subject<void>();
+  private pagination$ = new Subject<string | null>();
   private error$ = new Subject<string | null>();
 
   private subredditChanged$ = this.subredditFormControl.valueChanges.pipe(
@@ -57,11 +49,11 @@ export class RedditService {
   private gifsLoaded$ = this.subredditChanged$.pipe(
     switchMap((subreddit) =>
       this.pagination$.pipe(
-        startWith(undefined),
-        concatMap(() => {
+        startWith(null),
+        concatMap((lastKnownGif) => {
           return this.fetchFromReddit(
             subreddit,
-            this.lastKnownGif(),
+            lastKnownGif,
             this.gifsPerPage
           ).pipe(
             // A single request might not give us enough valid gifs for a
@@ -79,10 +71,10 @@ export class RedditService {
 
               return shouldKeepTrying
                 ? this.fetchFromReddit(
-                    subreddit,
-                    lastKnownGif,
-                    remainingGifsToFetch
-                  )
+                  subreddit,
+                  lastKnownGif,
+                  remainingGifsToFetch
+                )
                 : EMPTY;
             })
           );
@@ -91,28 +83,35 @@ export class RedditService {
     )
   );
 
-  constructor() {
-    //reducers
-    const nextState$ = merge(
-      this.subredditChanged$.pipe(
-        map(() => ({
-          loading: true,
-          gifs: [],
-          lastKnownGif: null,
-        }))
-      ),
-      this.error$.pipe(map((error) => ({ error })))
-    );
+  private sources$ = merge(
+    this.subredditChanged$.pipe(
+      map(() => ({
+        loading: true,
+        gifs: [],
+        lastKnownGif: null,
+      }))
+    ),
+    this.error$.pipe(map((error) => ({ error })))
+  );
 
-    connect(this.state)
-      .with(nextState$)
-      .with(this.gifsLoaded$, (state, response) => ({
-        ...state,
-        gifs: [...state.gifs, ...response.gifs],
-        loading: false,
-        lastKnownGif: response.lastKnownGif,
-      }));
-  }
+  // state
+  state = signalSlice({
+    initialState: this.initialState,
+    sources: [
+      this.sources$,
+      (state) =>
+        this.gifsLoaded$.pipe(
+          map((response) => ({
+            gifs: [...state().gifs, ...response.gifs],
+            loading: false,
+            lastKnownGif: response.lastKnownGif,
+          }))
+        ),
+    ],
+    actionSources: {
+      pagination: this.pagination$,
+    },
+  });
 
   private fetchFromReddit(
     subreddit: string,
@@ -122,7 +121,7 @@ export class RedditService {
     return this.http
       .get<RedditResponse>(
         `https://www.reddit.com/r/${subreddit}/hot/.json?limit=100` +
-          (after ? `&after=${after}` : '')
+        (after ? `&after=${after}` : '')
       )
       .pipe(
         catchError((err) => {
