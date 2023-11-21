@@ -13,7 +13,7 @@ import {
   concatMap,
   catchError,
 } from 'rxjs/operators';
-import { signalSlice } from 'ngxtension/signal-slice';
+import { signalSlice } from '../utils/signal-slice';
 
 export interface GifsState {
   gifs: Gif[];
@@ -112,6 +112,10 @@ export class RedditService {
       pagination: this.pagination$,
     },
   });
+
+  constructor() {
+    this.state.pagination(null);
+  }
 
   private fetchFromReddit(
     subreddit: string,
