@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Gif, RedditPost, RedditResponse } from '../interfaces';
 import { FormControl } from '@angular/forms';
-import { EMPTY, Subject, merge } from 'rxjs';
+import { EMPTY } from 'rxjs';
 import {
   map,
   startWith,
@@ -13,7 +13,8 @@ import {
   concatMap,
   catchError,
 } from 'rxjs/operators';
-import { signalSlice } from 'ngxtension/signal-slice';
+import { rxState } from '@rx-angular/state';
+import { rxActions } from '@rx-angular/state/actions';
 
 export interface GifsState {
   gifs: Gif[];
@@ -23,22 +24,50 @@ export interface GifsState {
 }
 
 @Injectable({ providedIn: 'root' })
-export class RedditService {
+export class RedditServiceRxAngular {
   private http = inject(HttpClient);
 
-  private initialState: GifsState = {
-    gifs: [],
-    error: null,
-    loading: true,
-    lastKnownGif: null,
-  };
   private gifsPerPage = 20;
 
-  subredditFormControl = new FormControl();
+  // Actions
+  actions = rxActions<{ pagination: string | null; error: string | null }>();
 
-  //sources
-  private pagination$ = new Subject<string | null>();
-  private error$ = new Subject<string | null>();
+  // State
+  state = rxState<GifsState>(({ set, connect }) => {
+    // set initial state
+    set({
+      gifs: [],
+      error: null,
+      loading: true,
+      lastKnownGif: null,
+    });
+
+    connect('error', this.actions.error$);
+
+    connect(this.gifsLoaded$, (state, response) => ({
+      gifs: [...state.gifs, ...response.gifs],
+      loading: false,
+      lastKnownGif: response.lastKnownGif,
+    }));
+
+    connect(
+      this.subredditChanged$.pipe(
+        map(() => ({
+          loading: true,
+          gifs: [],
+          lastKnownGif: null,
+        }))
+      )
+    );
+  });
+
+  // Selectors
+  error = this.state.signal('error');
+  loading = this.state.signal('loading');
+  gifs = this.state.signal('gifs');
+  lastKnownGif = this.state.signal('lastKnownGif');
+
+  subredditFormControl = new FormControl();
 
   private subredditChanged$ = this.subredditFormControl.valueChanges.pipe(
     debounceTime(300),
@@ -48,7 +77,7 @@ export class RedditService {
 
   private gifsLoaded$ = this.subredditChanged$.pipe(
     switchMap((subreddit) =>
-      this.pagination$.pipe(
+      this.actions.pagination$.pipe(
         startWith(null),
         concatMap((lastKnownGif) => {
           return this.fetchFromReddit(
@@ -83,36 +112,6 @@ export class RedditService {
     )
   );
 
-  private sources$ = merge(
-    this.subredditChanged$.pipe(
-      map(() => ({
-        loading: true,
-        gifs: [],
-        lastKnownGif: null,
-      }))
-    ),
-    this.error$.pipe(map((error) => ({ error })))
-  );
-
-  // state
-  state = signalSlice({
-    initialState: this.initialState,
-    sources: [
-      this.sources$,
-      (state) =>
-        this.gifsLoaded$.pipe(
-          map((response) => ({
-            gifs: [...state().gifs, ...response.gifs],
-            loading: false,
-            lastKnownGif: response.lastKnownGif,
-          }))
-        ),
-    ],
-    actionSources: {
-      pagination: this.pagination$,
-    },
-  });
-
   private fetchFromReddit(
     subreddit: string,
     after: string | null,
@@ -146,12 +145,12 @@ export class RedditService {
   private handleError(err: HttpErrorResponse) {
     // Handle specific error cases
     if (err.status === 404 && err.url) {
-      this.error$.next(`Failed to load gifs for /r/${err.url.split('/')[4]}`);
+      this.actions.error(`Failed to load gifs for /r/${err.url.split('/')[4]}`);
       return;
     }
 
     // Generic error if no cases match
-    this.error$.next(err.statusText);
+    this.actions.error(err.statusText);
   }
 
   private convertRedditPostsToGifs(posts: RedditPost[]) {
