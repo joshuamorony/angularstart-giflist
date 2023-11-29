@@ -22,6 +22,7 @@
     "@angular/router": "^17.0.0-next.6",
     "ngx-infinite-scroll": "^16.0.0",
     "ngxtension": "^1.4.0",
+    "@rx-angular/state": "^17.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.0"

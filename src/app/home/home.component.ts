@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { GifListComponent } from './ui/gif-list.component';
-import { RedditService } from '../shared/data-access/reddit.service';
 import { SearchBarComponent } from './ui/search-bar.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { RedditServiceRxAngular } from '../shared/data-access/reddit.service-rxa';
 
 @Component({
   standalone: true,
@@ -11,16 +11,16 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
   template: `
     <app-search-bar
       [subredditFormControl]="redditService.subredditFormControl"
-    ></app-search-bar>
+    />
 
-    @if (redditService.state.loading()){
+    @if (redditService.loading()){
     <mat-progress-spinner mode="indeterminate" diameter="50" />
     } @else {
     <app-gif-list
-      [gifs]="redditService.state.gifs()"
+      [gifs]="redditService.gifs()"
       infiniteScroll
       (scrolled)="
-        redditService.state.pagination(redditService.state.lastKnownGif())
+        redditService.actions.pagination(redditService.lastKnownGif())
       "
       class="grid-container"
     />
@@ -41,5 +41,5 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
   ],
 })
 export default class HomeComponent {
-  redditService = inject(RedditService);
+  redditService = inject(RedditServiceRxAngular);
 }
