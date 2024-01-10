@@ -142,12 +142,6 @@ export class RedditService {
             ? posts[posts.length - 1].data.name
             : null;
 
-          if (posts.length > gifsRequired) {
-            // too many, trim
-            gifs = gifs.slice(0, gifsRequired - gifs.length);
-            lastKnownGif = gifs[gifs.length - 1]?.name ?? null;
-          }
-
           return {
             gifs,
             gifsRequired,
