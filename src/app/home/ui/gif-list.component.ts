@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,30 +10,29 @@ import { WINDOW } from 'src/app/shared/utils/injection-tokens';
   standalone: true,
   selector: 'app-gif-list',
   template: `
-    @for (gif of gifs; track gif.permalink){
-    <div>
-      <app-gif-player
-        [src]="gif.src"
-        [thumbnail]="gif.thumbnail"
-        data-testid="gif-list-item"
-      ></app-gif-player>
-      <mat-toolbar color="primary">
-        <span>{{ gif.title }}</span>
-        <span class="toolbar-spacer"></span>
-        <button
-          mat-icon-button
-          (click)="window.open('https://reddit.com/' + gif.permalink)"
-        >
-          <mat-icon>comment</mat-icon>
-        </button>
-      </mat-toolbar>
-    </div>
+    @for (gif of gifs(); track gif.permalink) {
+      <div>
+        <app-gif-player
+          [src]="gif.src"
+          [thumbnail]="gif.thumbnail"
+          data-testid="gif-list-item"
+        ></app-gif-player>
+        <mat-toolbar color="primary">
+          <span>{{ gif.title }}</span>
+          <span class="toolbar-spacer"></span>
+          <button
+            mat-icon-button
+            (click)="window.open('https://reddit.com/' + gif.permalink)"
+          >
+            <mat-icon>comment</mat-icon>
+          </button>
+        </mat-toolbar>
+      </div>
     } @empty {
-    <p data-testid="no-gifs">Can't find any gifs 🤷</p>
+      <p data-testid="no-gifs">Can't find any gifs 🤷</p>
     }
   `,
   imports: [
-    CommonModule,
     GifPlayerComponent,
     MatToolbarModule,
     MatIconModule,
@@ -61,7 +59,6 @@ import { WINDOW } from 'src/app/shared/utils/injection-tokens';
   ],
 })
 export class GifListComponent {
-  @Input({ required: true }) gifs!: Gif[];
-
+  gifs = input.required<Gif[]>();
   window = inject(WINDOW);
 }
