@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -15,7 +15,7 @@ import { MatInputModule } from '@angular/material/input';
           matInput
           placeholder="subreddit..."
           type="text"
-          [formControl]="subredditFormControl"
+          [formControl]="subredditFormControl()"
         />
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
@@ -42,5 +42,5 @@ import { MatInputModule } from '@angular/material/input';
   ],
 })
 export class SearchBarComponent {
-  @Input({ required: true }) subredditFormControl!: FormControl;
+  subredditFormControl = input.required<FormControl>();
 }
