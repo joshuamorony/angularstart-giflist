@@ -1,5 +1,4 @@
 import { Component, effect, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RedditService } from './shared/data-access/reddit.service';
@@ -7,7 +6,7 @@ import { RedditService } from './shared/data-access/reddit.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [RouterOutlet],
   template: ` <router-outlet></router-outlet> `,
   styles: [],
 })
