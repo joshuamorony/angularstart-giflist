@@ -52,7 +52,7 @@ export class RedditService {
     debounceTime(300),
     distinctUntilChanged(),
     startWith('gifs'),
-    map((subreddit) => (subreddit.length ? subreddit : 'gifs'))
+    map((subreddit) => (subreddit.length ? subreddit : 'gifs')),
   );
 
   private gifsLoaded$ = this.subredditChanged$.pipe(
@@ -63,7 +63,7 @@ export class RedditService {
           return this.fetchFromReddit(
             subreddit,
             lastKnownGif,
-            this.gifsPerPage
+            this.gifsPerPage,
           ).pipe(
             // A single request might not give us enough valid gifs for a
             // full page, as not every post is a valid gif
@@ -82,14 +82,14 @@ export class RedditService {
                 ? this.fetchFromReddit(
                     subreddit,
                     lastKnownGif,
-                    remainingGifsToFetch
+                    remainingGifsToFetch,
                   )
                 : EMPTY;
-            })
+            }),
           );
-        })
-      )
-    )
+        }),
+      ),
+    ),
   );
 
   constructor() {
@@ -109,26 +109,26 @@ export class RedditService {
         gifs: [...state.gifs, ...response.gifs],
         loading: false,
         lastKnownGif: response.lastKnownGif,
-      }))
+      })),
     );
 
     this.error$.pipe(takeUntilDestroyed()).subscribe((error) =>
       this.state.update((state) => ({
         ...state,
         error,
-      }))
+      })),
     );
   }
 
   private fetchFromReddit(
     subreddit: string,
     after: string | null,
-    gifsRequired: number
+    gifsRequired: number,
   ) {
     return this.http
       .get<RedditResponse>(
         `https://www.reddit.com/r/${subreddit}/hot/.json?limit=100` +
-          (after ? `&after=${after}` : '')
+          (after ? `&after=${after}` : ''),
       )
       .pipe(
         catchError((err) => {
@@ -147,7 +147,7 @@ export class RedditService {
             gifsRequired,
             lastKnownGif,
           };
-        })
+        }),
       );
   }
 
@@ -172,13 +172,17 @@ export class RedditService {
           ? `/assets/${thumbnail}.png`
           : thumbnail;
 
+        const validThumbnail =
+          modifiedThumbnail.endsWith('.jpg') ||
+          modifiedThumbnail.endsWith('.png');
+
         return {
           src: this.getBestSrcForGif(post),
           author: post.data.author,
           name: post.data.name,
           permalink: post.data.permalink,
           title: post.data.title,
-          thumbnail: modifiedThumbnail,
+          thumbnail: validThumbnail ? modifiedThumbnail : `/assets/default.png`,
           comments: post.data.num_comments,
         };
       })
