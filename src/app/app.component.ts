@@ -16,11 +16,11 @@ export class AppComponent {
 
   constructor() {
     effect(() => {
-      const error = this.redditService.error();
+      const error = this.redditService.gifsLoaded.error();
 
-      if (error !== null) {
-        this.snackBar.open(error, 'Dismiss', { duration: 2000 });
-      }
+      // if (error !== null) {
+      //   this.snackBar.open(error, 'Dismiss', { duration: 2000 });
+      // }
     });
   }
 }
