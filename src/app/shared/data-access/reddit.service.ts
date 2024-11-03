@@ -53,6 +53,12 @@ export class RedditService {
     },
   });
 
+  constructor() {
+    effect(() => {
+      this.paginateAfter.set(this.gifsLoaded.value()?.paginateAfter ?? null);
+    });
+  }
+
   private fetchFromReddit(
     subreddit: string,
     after: string | null,
