@@ -1,11 +1,10 @@
-import { Injectable, effect, inject, linkedSignal } from '@angular/core';
+import { Injectable, inject, linkedSignal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Gif, RedditPost, RedditResponse } from '../interfaces';
 import { FormControl } from '@angular/forms';
 import {
   EMPTY,
-  catchError,
   debounceTime,
   distinctUntilChanged,
   expand,
@@ -17,7 +16,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class RedditService {
   private http = inject(HttpClient);
-  private gifsPerPage = 20;
+  private gifsPerPage = 5;
 
   subredditFormControl = new FormControl();
 
@@ -47,17 +46,20 @@ export class RedditService {
   gifs = linkedSignal<ReturnType<typeof this.gifsLoaded.value>, Gif[]>({
     source: this.gifsLoaded.value,
     computation: (source, prev) => {
-      if (typeof source === 'undefined') return [];
-      if (!prev) return source.gifs;
+      // initial and page loads
+      if (typeof source === 'undefined') return prev?.value ?? [];
+
+      // clear on subreddit change
+      if (
+        !prev ||
+        !prev.value[0]?.permalink.startsWith(`/r/${source.subreddit}`)
+      )
+        return source.gifs;
+
+      // accumulate values on paginate
       return [...prev.value, ...source.gifs];
     },
   });
-
-  constructor() {
-    effect(() => {
-      this.paginateAfter.set(this.gifsLoaded.value()?.paginateAfter ?? null);
-    });
-  }
 
   private fetchFromReddit(
     subreddit: string,
@@ -81,6 +83,7 @@ export class RedditService {
             gifs,
             gifsRequired,
             paginateAfter,
+            subreddit,
           };
         }),
       );
@@ -101,7 +104,7 @@ export class RedditService {
       expand((response, index) => {
         const { gifs, gifsRequired, paginateAfter } = response;
         const remainingGifsToFetch = gifsRequired - gifs.length;
-        const maxAttempts = 15;
+        const maxAttempts = 5;
 
         const shouldKeepTrying =
           remainingGifsToFetch > 0 &&
@@ -112,6 +115,22 @@ export class RedditService {
           ? this.fetchFromReddit(subreddit, paginateAfter, remainingGifsToFetch)
           : EMPTY;
       }),
+      map((response) => {
+        const { gifs, gifsRequired } = response;
+        const remainingGifsToFetch = gifsRequired - gifs.length;
+
+        if (remainingGifsToFetch < 0) {
+          // trim to page size
+          const trimmedGifs = response.gifs.slice(0, remainingGifsToFetch);
+          return {
+            ...response,
+            gifs: trimmedGifs,
+            paginateAfter: trimmedGifs[trimmedGifs.length - 1].name,
+          };
+        }
+
+        return response;
+      }),
       reduce(
         (acc, curr) => ({
           ...curr,
@@ -120,6 +139,7 @@ export class RedditService {
         {
           gifs: [] as Gif[],
           paginateAfter: null as string | null,
+          subreddit: 'gifs',
         },
       ),
     );
