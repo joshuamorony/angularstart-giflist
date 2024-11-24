@@ -131,6 +131,18 @@ export class RedditService {
 
         return response;
       }),
+      reduce(
+        (acc, curr) => ({
+          ...curr,
+          gifs: [...acc.gifs, ...curr.gifs],
+        }),
+        {
+          gifs: [] as Gif[],
+          paginateAfter: null as string | null,
+          gifsRequired: this.gifsPerPage,
+          subreddit: 'gifs',
+        },
+      ),
     );
   }
 
