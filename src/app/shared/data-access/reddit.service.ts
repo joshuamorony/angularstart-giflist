@@ -3,15 +3,15 @@ import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { Gif, RedditPost, RedditResponse } from '../interfaces';
 import { FormControl } from '@angular/forms';
+import { EMPTY } from 'rxjs';
 import {
-  EMPTY,
+  reduce,
   debounceTime,
   distinctUntilChanged,
   expand,
   map,
-  reduce,
   startWith,
-} from 'rxjs';
+} from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class RedditService {
