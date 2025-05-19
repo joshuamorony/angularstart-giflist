@@ -35,12 +35,12 @@ export class RedditService {
   });
 
   gifsLoaded = rxResource({
-    request: () => ({
+    params: () => ({
       subreddit: this.subreddit(),
       paginateAfter: this.paginateAfter(),
     }),
-    loader: ({ request }) =>
-      this.fetchRecursivelyFromReddit(request.subreddit, request.paginateAfter),
+    stream: ({ params }) =>
+      this.fetchRecursivelyFromReddit(params.subreddit, params.paginateAfter),
   });
 
   gifs = linkedSignal<ReturnType<typeof this.gifsLoaded.value>, Gif[]>({
